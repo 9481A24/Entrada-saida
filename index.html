@@ -33,18 +33,37 @@
         line-height: 34px;
     }
 
-    /* cores novas — NÃO ALTERAM NADA DO CÓDIGO */
+    /* cores sábados e domingos */
     .sabado {
-        background-color: #fff3a3; /* amarelo claro */
+        background-color: #fff3a3;
     }
     .domingo {
-        background-color: #bcd7ff; /* azul clara */
+        background-color: #bcd7ff;
+    }
+
+    /* --- SOMENTE IMPRESSÃO DA TABELA --- */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #areaImprimir, #areaImprimir * {
+            visibility: visible;
+        }
+        #areaImprimir {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
     }
 </style>
 
 </head>
 <body>
 
+<button onclick="window.print()">Imprimir Planilha</button>
+
+<div id="areaImprimir">
 <h2>Controle Financeiro — Período 10/11/2025 até 10/05/2026</h2>
 
 <table id="tabelaDatas">
@@ -62,6 +81,7 @@
     SAÍDAS: R$ 0,00 <br>
     SALDO FINAL: R$ 0,00
 </div>
+</div>
 
 <script>
     function gerarDatas() {
@@ -78,8 +98,7 @@
 
             let tr = document.createElement("tr");
 
-            // identifica sábado (6) e domingo (0)
-            let diaSemana = inicio.getDay();
+            let diaSemana = inicio.getDay(); // 0 domingo, 6 sábado
 
             if (diaSemana === 6) tr.classList.add("sabado");
             if (diaSemana === 0) tr.classList.add("domingo");
@@ -140,5 +159,6 @@
 
 </body>
 </html>
+
 
 
