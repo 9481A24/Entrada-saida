@@ -19,17 +19,18 @@
         padding: 4px 10px;
         cursor: pointer;
     }
-    #totalGeral {
-        margin-top: 20px;
-        font-size: 22px;
-        font-weight: bold;
-    }
-    input.valor {
+    .valor, .saida {
         width: 100%;
         box-sizing: border-box;
         padding: 4px;
         border: none;
         text-align: right;
+    }
+    #totais {
+        margin-top: 25px;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 34px;
     }
 </style>
 
@@ -42,12 +43,17 @@
     <tr>
         <th>Data</th>
         <th>Origem</th>
-        <th>Valor</th>
+        <th>Entrada</th>
+        <th>Saída</th>
         <th>Ação</th>
     </tr>
 </table>
 
-<div id="totalGeral">TOTAL: R$ 0,00</div>
+<div id="totais">
+    ENTRADAS: R$ 0,00 <br>
+    SAÍDAS: R$ 0,00 <br>
+    SALDO FINAL: R$ 0,00
+</div>
 
 <script>
     function gerarDatas() {
@@ -68,6 +74,7 @@
                 <td>${dia}/${mes}/${ano}</td>
                 <td contenteditable="true"></td>
                 <td><input type="text" class="valor" placeholder="0,00"></td>
+                <td><input type="text" class="saida" placeholder="0,00"></td>
                 <td><button onclick="apagar(this)">Apagar</button></td>
             `;
 
@@ -76,51 +83,41 @@
             inicio.setDate(inicio.getDate() + 1);
         }
 
-        // adiciona listeners de input em todos os campos valor
-        document.querySelectorAll('.valor').forEach(inp => {
-            inp.addEventListener('input', somar);
-            // também limpa espaços indesejados ao sair do campo
-            inp.addEventListener('blur', () => {
-                inp.value = formatarMoedaInput(inp.value);
-                somar();
-            });
-        });
+        document.querySelectorAll('.valor').forEach(inp => inp.addEventListener('input', somar));
+        document.querySelectorAll('.saida').forEach(inp => inp.addEventListener('input', somar));
     }
 
-    function formatarMoedaInput(text) {
-        // Remove tudo que não é número, vírgula ou ponto, depois transforma em formato com vírgula
-        let cleaned = String(text).trim().replace(/[^\d,.\-]/g, '');
-        if (cleaned === '') return '';
-        // transformar vírgula em ponto pra parseFloat
-        cleaned = cleaned.replace(/,/, '.');
-        let n = parseFloat(cleaned);
-        if (isNaN(n)) return '';
-        // formatar com duas casas e vírgula
-        return n.toFixed(2).replace('.', ',');
+    function formatar(v) {
+        let t = v.trim().replace(/[^\d,.-]/g, '');
+        t = t.replace(/\./g, '').replace(',', '.');
+        let n = parseFloat(t);
+        if (isNaN(n)) return 0;
+        return n;
     }
 
     function somar() {
-        let valores = document.querySelectorAll(".valor");
-        let total = 0;
+        let entradas = 0;
+        let saidas = 0;
 
-        valores.forEach(v => {
-            let txt = v.value.trim();
-            if (txt === '') return;
-            // aceita "1.234,56" ou "1234.56" ou "1234,56"
-            // padroniza: remove pontos de milhar, troca vírgula por ponto
-            let pad = txt.replace(/\./g, '').replace(',', '.');
-            let n = parseFloat(pad);
-            if (!isNaN(n)) total += n;
+        document.querySelectorAll(".valor").forEach(v => {
+            entradas += formatar(v.value);
         });
 
-        // mostra com vírgula e 2 decimais
-        document.getElementById("totalGeral").innerText =
-            "TOTAL: R$ " + total.toFixed(2).replace('.', ',');
+        document.querySelectorAll(".saida").forEach(v => {
+            saidas += formatar(v.value);
+        });
+
+        let saldo = entradas - saidas;
+
+        document.getElementById("totais").innerHTML = `
+            ENTRADAS: R$ ${entradas.toFixed(2).replace('.', ',')} <br>
+            SAÍDAS: R$ ${saidas.toFixed(2).replace('.', ',')} <br>
+            SALDO FINAL: R$ ${saldo.toFixed(2).replace('.', ',')}
+        `;
     }
 
     function apagar(botao) {
-        let tr = botao.parentElement.parentElement;
-        tr.remove();
+        botao.parentElement.parentElement.remove();
         somar();
     }
 
@@ -129,3 +126,4 @@
 
 </body>
 </html>
+
