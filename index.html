@@ -32,6 +32,14 @@
         font-weight: bold;
         line-height: 34px;
     }
+
+    /* cores novas — NÃO ALTERAM NADA DO CÓDIGO */
+    .sabado {
+        background-color: #fff3a3; /* amarelo claro */
+    }
+    .domingo {
+        background-color: #bcd7ff; /* azul clara */
+    }
 </style>
 
 </head>
@@ -69,6 +77,12 @@
             let ano = inicio.getFullYear();
 
             let tr = document.createElement("tr");
+
+            // identifica sábado (6) e domingo (0)
+            let diaSemana = inicio.getDay();
+
+            if (diaSemana === 6) tr.classList.add("sabado");
+            if (diaSemana === 0) tr.classList.add("domingo");
 
             tr.innerHTML = `
                 <td>${dia}/${mes}/${ano}</td>
@@ -126,4 +140,5 @@
 
 </body>
 </html>
+
 
